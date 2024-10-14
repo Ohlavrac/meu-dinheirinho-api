@@ -1,0 +1,2 @@
+ALTER TABLE transaction
+ADD COLUMN category VARCHAR(200)
