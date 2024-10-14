@@ -34,7 +34,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = recoverTokenFromHeader(request);
         
-        if (verifyEndpoint(request.getRequestURI())) {
+        if (!verifyEndpoint(request.getRequestURI())) {
             var login = tokenService.validateToken(token);
             
             if (login != null) {
@@ -45,7 +45,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
-                throw new RuntimeException("Token erro");
+                throw new RuntimeException("Token erro: " + login);
             }
         }
 
