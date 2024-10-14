@@ -33,6 +33,7 @@ public class TransactionEntity {
 
     private String title;
     private double value;
+    private String category;
     private TransactionType transaction_type;
 
     @CreationTimestamp
