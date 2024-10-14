@@ -11,6 +11,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.ohlavrac.meu_dinheirinho_api.domain.entities.users.UserDetailsImpl;
 import com.ohlavrac.meu_dinheirinho_api.domain.entities.users.UsersEntity;
 
 @Service
@@ -20,12 +21,12 @@ public class TokenService {
 
     private String ISSUER;
     
-    public String generateToken(UsersEntity user) {
+    public String generateToken(UserDetailsImpl user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET);
             String token = JWT.create()
                             .withIssuer(ISSUER)
-                            .withSubject(user.getEmail())
+                            .withSubject(user.getUsername())
                             .withExpiresAt(generateExpirationDate())
                             .sign(algorithm);
             return token;
