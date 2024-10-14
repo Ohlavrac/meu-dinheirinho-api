@@ -23,10 +23,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
-    private TokenService tokenService;
+    TokenService tokenService;
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
 
     @Override
