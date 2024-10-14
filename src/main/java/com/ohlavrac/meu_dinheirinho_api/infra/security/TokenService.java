@@ -12,7 +12,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.ohlavrac.meu_dinheirinho_api.domain.entities.users.UserDetailsImpl;
-import com.ohlavrac.meu_dinheirinho_api.domain.entities.users.UsersEntity;
 
 @Service
 public class TokenService {
