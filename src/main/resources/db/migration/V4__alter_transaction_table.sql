@@ -1,0 +1,8 @@
+ALTER TABLE transaction DROP CONSTRAINT IF EXISTS user_id;
+ALTER TABLE transaction ALTER COLUMN user_id SET DATA TYPE UUID;
+
+ALTER TABLE transaction
+ADD CONSTRAINT fk_user_transaction
+FOREIGN KEY (user_id)
+REFERENCES users(id)
+ON DELETE CASCADE;
