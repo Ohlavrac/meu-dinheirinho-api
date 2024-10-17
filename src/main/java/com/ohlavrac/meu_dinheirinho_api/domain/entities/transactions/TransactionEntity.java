@@ -11,9 +11,12 @@ import com.ohlavrac.meu_dinheirinho_api.domain.entities.users.UsersEntity;
 import com.ohlavrac.meu_dinheirinho_api.domain.enums.TransactionType;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +37,8 @@ public class TransactionEntity {
     private String title;
     private double value;
     private String category;
+
+    @Enumerated(EnumType.STRING)
     private TransactionType transaction_type;
 
     @CreationTimestamp
@@ -42,6 +47,7 @@ public class TransactionEntity {
     @UpdateTimestamp
     private Date updated_at;
 
-    @JoinColumn(name = "user_id")
-    private UsersEntity user;
+    @ManyToOne
+    @JoinColumn(name = "users_id")
+    private UsersEntity users;
 }
