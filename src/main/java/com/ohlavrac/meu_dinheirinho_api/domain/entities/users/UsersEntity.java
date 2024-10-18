@@ -30,6 +30,7 @@ public class UsersEntity implements Serializable {
     private String name;
     private String email;
     private String password;
+    private double balance;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
