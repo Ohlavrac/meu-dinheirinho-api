@@ -35,6 +35,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST, ENDPOINTS_WITH_OUT_AUTH).permitAll()
                     .requestMatchers(HttpMethod.POST, "/transaction/register").authenticated()
                     .requestMatchers(HttpMethod.GET, "/user/info").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/transaction/user/all").authenticated()
                     .anyRequest().permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
