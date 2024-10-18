@@ -48,6 +48,6 @@ public class TransactionEntity {
     private Date updated_at;
 
     @ManyToOne
-    @JoinColumn(name = "users_id")
+    @JoinColumn(name = "users_id", referencedColumnName = "id")
     private UsersEntity users;
 }
