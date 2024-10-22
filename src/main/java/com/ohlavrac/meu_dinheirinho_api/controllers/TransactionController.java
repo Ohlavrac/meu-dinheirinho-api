@@ -43,6 +43,11 @@ public class TransactionController {
         }
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<TransactionResponseDTO> getUserTransactionByID(@RequestHeader("Authorization") String token, @RequestParam(required = true) UUID id) {
+        return ResponseEntity.ok(this.transactionService.getUserTransactionById(token, id));
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteTransactionById(@RequestHeader("Authorization") String token, @RequestParam(required = true) UUID id) {
         this.transactionService.deleteTransaction(token, id);

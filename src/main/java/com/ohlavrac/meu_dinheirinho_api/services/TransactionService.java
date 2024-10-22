@@ -64,6 +64,20 @@ public class TransactionService {
         )).toList();
     }
 
+    public TransactionResponseDTO getUserTransactionById(String token, UUID id) {
+        UsersEntity user = getUSer(token);
+
+        TransactionEntity transactionEntity = this.transactionRepository.getUserTransactionById(id, user.getId());
+
+        return new TransactionResponseDTO(
+            transactionEntity.getId(),
+            transactionEntity.getTitle(),
+            transactionEntity.getValue(),
+            transactionEntity.getTransaction_type(),
+            transactionEntity.getCategory()
+        );
+    }
+
     public List<TransactionResponseDTO> getAllUserTransactionsByType(String token, TransactionType type) {
         UsersEntity user = getUSer(token);
         List<TransactionEntity> transactionsEntity = this.transactionRepository.findByUsersId(user.getId());

@@ -22,4 +22,7 @@ public interface TransactionRepository  extends JpaRepository<TransactionEntity,
     @Transactional
     @Query("DELETE FROM TransactionEntity t WHERE t.id = :transactionId AND t.users.id = :userId")
     int deleteTransactionByID(@Param("transactionId") UUID transactionId, @Param("userId") UUID userId);
+
+    @Query("SELECT t FROM TransactionEntity t WHERE t.id = :transactionId AND t.users.id = :userId")
+    TransactionEntity getUserTransactionById(@Param("transactionId") UUID transactionId, @Param("userId") UUID userId);
 }
