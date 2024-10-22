@@ -88,9 +88,19 @@ public class TransactionService {
 
     public boolean deleteTransaction(String token, UUID transactionID) {
         UsersEntity user = getUSer(token);
+
+        TransactionEntity transactionEntity = this.transactionRepository.findById(transactionID).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        double value = transactionEntity.getValue();
+        TransactionType type = transactionEntity.getTransaction_type();
+
         int deleteRows = this.transactionRepository.deleteTransactionByID(transactionID, user.getId());
 
         if (deleteRows != 0) {
+            if (type == TransactionType.EXPENSE) {
+                this.userRepository.updateBalance(user.getId(), user.getBalance()+value);
+            } else {
+                this.userRepository.updateBalance(user.getId(), user.getBalance()-value);
+            }
             return true;
         } else {
             return false;
