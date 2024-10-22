@@ -1,6 +1,7 @@
 package com.ohlavrac.meu_dinheirinho_api.services;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,6 +61,28 @@ public class TransactionService {
             transaction.getTransaction_type(),
             transaction.getCategory()
         )).toList();
+    }
+
+    public List<TransactionResponseDTO> getAllUserTransactionsByType(String token, TransactionType type) {
+        UsersEntity user = getUSer(token);
+        List<TransactionEntity> transactionsEntity = this.transactionRepository.findByUsersId(user.getId());
+        List<TransactionResponseDTO> transctionsResponse = new ArrayList<TransactionResponseDTO>();
+
+        for (int index = 0; index < transactionsEntity.size(); index++) {
+            if (transactionsEntity.get(index).getTransaction_type() == type) {
+                transctionsResponse.add(new TransactionResponseDTO(
+                    transactionsEntity.get(index).getId(),
+                    transactionsEntity.get(index).getTitle(),
+                    transactionsEntity.get(index).getValue(),
+                    transactionsEntity.get(index).getTransaction_type(),
+                    transactionsEntity.get(index).getCategory()
+                ));
+            } else {
+                continue;
+            }
+        }
+
+        return transctionsResponse;
     }
 
     private UsersEntity getUSer(String token) {

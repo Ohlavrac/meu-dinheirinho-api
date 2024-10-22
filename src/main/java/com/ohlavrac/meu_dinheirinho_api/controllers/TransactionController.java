@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ohlavrac.meu_dinheirinho_api.domain.enums.TransactionType;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionRequestDTO;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionResponseDTO;
 import com.ohlavrac.meu_dinheirinho_api.services.TransactionService;
 
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/transactions")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
@@ -29,8 +31,13 @@ public class TransactionController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/user/all")
-    public ResponseEntity<List<TransactionResponseDTO>> getUserTransactions(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(this.transactionService.getAllUserTransaction(token));
+    @GetMapping()
+    public ResponseEntity<List<TransactionResponseDTO>> getUserTransactions(@RequestHeader("Authorization") String token, @RequestParam(required = false) TransactionType type) {
+        
+        if (type == null) {
+            return ResponseEntity.ok(this.transactionService.getAllUserTransaction(token));
+        } else {
+            return ResponseEntity.ok(this.transactionService.getAllUserTransactionsByType(token, type));
+        }
     }
 }
