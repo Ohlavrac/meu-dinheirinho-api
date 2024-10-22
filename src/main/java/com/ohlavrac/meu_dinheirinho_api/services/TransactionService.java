@@ -1,6 +1,7 @@
 package com.ohlavrac.meu_dinheirinho_api.services;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,17 @@ public class TransactionService {
         }
 
         return transctionsResponse;
+    }
+
+    public boolean deleteTransaction(String token, UUID transactionID) {
+        UsersEntity user = getUSer(token);
+        int deleteRows = this.transactionRepository.deleteTransactionByID(transactionID, user.getId());
+
+        if (deleteRows != 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private UsersEntity getUSer(String token) {

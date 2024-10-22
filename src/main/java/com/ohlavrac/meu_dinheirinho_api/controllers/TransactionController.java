@@ -1,9 +1,11 @@
 package com.ohlavrac.meu_dinheirinho_api.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,5 +41,11 @@ public class TransactionController {
         } else {
             return ResponseEntity.ok(this.transactionService.getAllUserTransactionsByType(token, type));
         }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteTransactionById(@RequestHeader("Authorization") String token, @RequestParam(required = true) UUID id) {
+        this.transactionService.deleteTransaction(token, id);
+        return ResponseEntity.ok().build();
     }
 }
