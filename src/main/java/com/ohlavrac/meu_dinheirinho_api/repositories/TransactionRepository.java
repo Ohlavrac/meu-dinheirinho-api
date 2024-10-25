@@ -2,6 +2,7 @@ package com.ohlavrac.meu_dinheirinho_api.repositories;
 
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,5 +25,5 @@ public interface TransactionRepository  extends JpaRepository<TransactionEntity,
     int deleteTransactionByID(@Param("transactionId") UUID transactionId, @Param("userId") UUID userId);
 
     @Query("SELECT t FROM TransactionEntity t WHERE t.id = :transactionId AND t.users.id = :userId")
-    TransactionEntity getUserTransactionById(@Param("transactionId") UUID transactionId, @Param("userId") UUID userId);
+    Optional<TransactionEntity> getUserTransactionById(@Param("transactionId") UUID transactionId, @Param("userId") UUID userId);
 }

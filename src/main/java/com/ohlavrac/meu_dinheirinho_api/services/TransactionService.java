@@ -60,21 +60,25 @@ public class TransactionService {
             transaction.getTitle(),
             transaction.getValue(),
             transaction.getTransaction_type(),
-            transaction.getCategory()
+            transaction.getCategory(),
+            transaction.getCreated_at(),
+            transaction.getUpdated_at()
         )).toList();
     }
 
     public TransactionResponseDTO getUserTransactionById(String token, UUID id) {
         UsersEntity user = getUSer(token);
 
-        TransactionEntity transactionEntity = this.transactionRepository.getUserTransactionById(id, user.getId());
+        TransactionEntity transactionEntity = this.transactionRepository.getUserTransactionById(id, user.getId()).orElseThrow(() -> new RuntimeException("Transaction not foud"));
 
         return new TransactionResponseDTO(
             transactionEntity.getId(),
             transactionEntity.getTitle(),
             transactionEntity.getValue(),
             transactionEntity.getTransaction_type(),
-            transactionEntity.getCategory()
+            transactionEntity.getCategory(),
+            transactionEntity.getCreated_at(),
+            transactionEntity.getUpdated_at()
         );
     }
 
@@ -90,7 +94,9 @@ public class TransactionService {
                     transactionsEntity.get(index).getTitle(),
                     transactionsEntity.get(index).getValue(),
                     transactionsEntity.get(index).getTransaction_type(),
-                    transactionsEntity.get(index).getCategory()
+                    transactionsEntity.get(index).getCategory(),
+                    transactionsEntity.get(index).getCreated_at(),
+                    transactionsEntity.get(index).getUpdated_at()
                 ));
             } else {
                 continue;
@@ -100,6 +106,7 @@ public class TransactionService {
         return transctionsResponse;
     }
 
+    @Transactional
     public boolean deleteTransaction(String token, UUID transactionID) {
         UsersEntity user = getUSer(token);
 
@@ -111,10 +118,42 @@ public class TransactionService {
 
         if (deleteRows != 0) {
             if (type == TransactionType.EXPENSE) {
+                System.out.println("OPA MEU");
                 this.userRepository.updateBalance(user.getId(), user.getBalance()+value);
             } else {
                 this.userRepository.updateBalance(user.getId(), user.getBalance()-value);
             }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Transactional
+    public boolean updateTransaction(String token, UUID id, TransactionRequestDTO data) {
+        UsersEntity user = getUSer(token);
+
+        TransactionEntity transactionEntity = this.transactionRepository.getReferenceById(id);
+        //TransactionEntity transactionEntity = this.transactionRepository.getUserTransactionById(data.id(), user.getId()).orElseThrow(() -> new RuntimeException("Transaction not foud"));
+
+        if (transactionEntity.getUsers().getId() == user.getId()) {
+            transactionEntity.setTitle(data.title().isEmpty() ? transactionEntity.getTitle() : data.title());
+
+            if (data.transaction_type() != transactionEntity.getTransaction_type() || data.value() != transactionEntity.getValue()) {
+                System.out.println("RAIVA");
+                if (data.transaction_type() == TransactionType.EXPENSE) {
+                    this.userRepository.updateBalance(user.getId(), (user.getBalance() - transactionEntity.getValue()) - data.value());
+                } else {
+                    this.userRepository.updateBalance(user.getId(), (user.getBalance() - transactionEntity.getValue()) + data.value());
+                }
+
+                transactionEntity.setTransaction_type(data.transaction_type());
+            }
+
+            transactionEntity.setValue(data.value() != transactionEntity.getValue() ? data.value() : transactionEntity.getValue());
+            transactionEntity.setCategory(data.category().isEmpty() ? transactionEntity.getCategory() : data.category());
+
+            this.transactionRepository.save(transactionEntity);
             return true;
         } else {
             return false;

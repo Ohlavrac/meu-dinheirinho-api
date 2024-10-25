@@ -38,6 +38,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/transactions").authenticated()
                     .requestMatchers(HttpMethod.GET, "transactions/indo").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/transactions/delete").authenticated()
+                    .requestMatchers(HttpMethod.PATCH, "/transactions/update").authenticated()
                     .anyRequest().permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -52,5 +53,15 @@ public class TransactionController {
     public ResponseEntity<Void> deleteTransactionById(@RequestHeader("Authorization") String token, @RequestParam(required = true) UUID id) {
         this.transactionService.deleteTransaction(token, id);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<Void> updateTransaction(@RequestHeader("Authorization") String token, @RequestBody TransactionRequestDTO data, @RequestParam(required = true) UUID id) {
+        boolean isUpdated = this.transactionService.updateTransaction(token, id, data);
+        if (isUpdated) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
