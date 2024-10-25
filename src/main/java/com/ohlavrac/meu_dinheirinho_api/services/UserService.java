@@ -21,7 +21,7 @@ public class UserService {
     public UserResponseDTO getUserInfo(String token) {
         UsersEntity user = getUSer(token);
 
-        UserResponseDTO responseDTO = new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        UserResponseDTO responseDTO = new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getBalance());
 
         return responseDTO;
     }
