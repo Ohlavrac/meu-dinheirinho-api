@@ -8,7 +8,8 @@ public record UserResponseDTO(
     UUID id,
     String name,
     String email,
-    UserRole role
+    UserRole role,
+    double balance
 ) {
 
 }
