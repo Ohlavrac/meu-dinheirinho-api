@@ -18,6 +18,7 @@ import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionRespons
 import com.ohlavrac.meu_dinheirinho_api.infra.security.TokenService;
 import com.ohlavrac.meu_dinheirinho_api.repositories.TransactionRepository;
 import com.ohlavrac.meu_dinheirinho_api.repositories.UserRepository;
+import com.ohlavrac.meu_dinheirinho_api.utils.VerifyPeriod;
 
 import jakarta.transaction.Transactional;
 
@@ -164,17 +165,7 @@ public class TransactionService {
     public List<TransactionResponseDTO> getTransactionsByPeriodAndType(String token, Periods period, TransactionType type) {
         List<TransactionResponseDTO> transctionsResponse = new ArrayList<TransactionResponseDTO>();
         LocalDate date = LocalDate.now();
-        LocalDate periodDateTime;
-        
-        if (period == Periods.PAST_WEEK) {
-            periodDateTime = date.minusDays(7);
-        } else if (period == Periods.PAST_MONTH) {
-            periodDateTime = date.minusMonths(1);
-        } else if (period == Periods.PAST_YEAR) {
-            periodDateTime = date.minusYears(1);
-        } else {
-            periodDateTime = date.minusDays(7);
-        }
+        LocalDate periodDateTime = new VerifyPeriod().verifyPeriod(period, date);
 
         UsersEntity user = getUSer(token);
 
@@ -200,17 +191,7 @@ public class TransactionService {
 
     public List<TransactionResponseDTO> getTransactionsByPeriod(String token, Periods period ) {
         LocalDate date = LocalDate.now();
-        LocalDate periodDateTime;
-
-        if (period == Periods.PAST_WEEK) {
-            periodDateTime = date.minusDays(7);
-        } else if (period == Periods.PAST_MONTH) {
-            periodDateTime = date.minusMonths(1);
-        } else if (period == Periods.PAST_YEAR) {
-            periodDateTime = date.minusYears(1);
-        } else {
-            periodDateTime = date.minusDays(7);
-        }
+        LocalDate periodDateTime = new VerifyPeriod().verifyPeriod(period, date);
 
         UsersEntity user = getUSer(token);
 
