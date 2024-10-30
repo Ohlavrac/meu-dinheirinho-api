@@ -3,6 +3,7 @@ package com.ohlavrac.meu_dinheirinho_api.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.ArrayList;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ohlavrac.meu_dinheirinho_api.domain.entities.transactions.TransactionEntity;
 import com.ohlavrac.meu_dinheirinho_api.domain.entities.users.UsersEntity;
+import com.ohlavrac.meu_dinheirinho_api.domain.enums.Periods;
 import com.ohlavrac.meu_dinheirinho_api.domain.enums.TransactionType;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionRequestDTO;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionResponseDTO;
@@ -140,7 +142,6 @@ public class TransactionService {
             transactionEntity.setTitle(data.title().isEmpty() ? transactionEntity.getTitle() : data.title());
 
             if (data.transaction_type() != transactionEntity.getTransaction_type() || data.value() != transactionEntity.getValue()) {
-                System.out.println("RAIVA");
                 if (data.transaction_type() == TransactionType.EXPENSE) {
                     this.userRepository.updateBalance(user.getId(), (user.getBalance() - transactionEntity.getValue()) - data.value());
                 } else {
@@ -158,6 +159,73 @@ public class TransactionService {
         } else {
             return false;
         }
+    }
+
+    public List<TransactionResponseDTO> getTransactionsByPeriodAndType(String token, Periods period, TransactionType type) {
+        List<TransactionResponseDTO> transctionsResponse = new ArrayList<TransactionResponseDTO>();
+        LocalDate date = LocalDate.now();
+        LocalDate periodDateTime;
+        
+        if (period == Periods.PAST_WEEK) {
+            periodDateTime = date.minusDays(7);
+        } else if (period == Periods.PAST_MONTH) {
+            periodDateTime = date.minusMonths(1);
+        } else if (period == Periods.PAST_YEAR) {
+            periodDateTime = date.minusYears(1);
+        } else {
+            periodDateTime = date.minusDays(7);
+        }
+
+        UsersEntity user = getUSer(token);
+
+        List<TransactionEntity> transactionEntity = this.transactionRepository.getTransactionsByTime(
+            java.sql.Date.valueOf(periodDateTime), user.getId()).orElseThrow(() -> new RuntimeException("Transactions not found"));
+        
+        for (int index = 0; index <= transactionEntity.size(); index++) {
+            if (transactionEntity.get(index).getTransaction_type() == type) {
+                transctionsResponse.add(new TransactionResponseDTO(
+                    transactionEntity.get(index).getId(),
+                    transactionEntity.get(index).getTitle(),
+                    transactionEntity.get(index).getValue(),
+                    transactionEntity.get(index).getTransaction_type(),
+                    transactionEntity.get(index).getCategory(),
+                    transactionEntity.get(index).getCreated_at(),
+                    transactionEntity.get(index).getUpdated_at()
+                ));
+            }
+        }
+
+        return transctionsResponse;
+    }
+
+    public List<TransactionResponseDTO> getTransactionsByPeriod(String token, Periods period ) {
+        LocalDate date = LocalDate.now();
+        LocalDate periodDateTime;
+
+        if (period == Periods.PAST_WEEK) {
+            periodDateTime = date.minusDays(7);
+        } else if (period == Periods.PAST_MONTH) {
+            periodDateTime = date.minusMonths(1);
+        } else if (period == Periods.PAST_YEAR) {
+            periodDateTime = date.minusYears(1);
+        } else {
+            periodDateTime = date.minusDays(7);
+        }
+
+        UsersEntity user = getUSer(token);
+
+        List<TransactionEntity> transactionEntity = this.transactionRepository.getTransactionsByTime(
+            java.sql.Date.valueOf(periodDateTime), user.getId()).orElseThrow(() -> new RuntimeException("Transactions not found"));
+        
+        return transactionEntity.stream().map(transaction -> new TransactionResponseDTO(
+            transaction.getId(),
+            transaction.getTitle(),
+            transaction.getValue(),
+            transaction.getTransaction_type(),
+            transaction.getCategory(),
+            transaction.getCreated_at(),
+            transaction.getUpdated_at()
+        )).toList();
     }
 
     private UsersEntity getUSer(String token) {

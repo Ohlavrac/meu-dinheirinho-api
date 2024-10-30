@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ohlavrac.meu_dinheirinho_api.domain.enums.Periods;
 import com.ohlavrac.meu_dinheirinho_api.domain.enums.TransactionType;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionRequestDTO;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionResponseDTO;
@@ -35,12 +36,22 @@ public class TransactionController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<TransactionResponseDTO>> getUserTransactions(@RequestHeader("Authorization") String token, @RequestParam(required = false) TransactionType type) {
+    public ResponseEntity<List<TransactionResponseDTO>> getUserTransactions(
+        @RequestHeader("Authorization") String token,
+        @RequestParam(required = false) TransactionType type,
+        @RequestParam(required = false) Periods period
+    ) {
         
-        if (type == null) {
-            return ResponseEntity.ok(this.transactionService.getAllUserTransaction(token));
+        if (type != null) {
+            if (period == null) {
+                return ResponseEntity.ok(this.transactionService.getAllUserTransactionsByType(token, type));
+            } else {
+                return ResponseEntity.ok(this.transactionService.getTransactionsByPeriodAndType(token, period, type));
+            }
+        } else if (type == null && period != null) {
+            return ResponseEntity.ok(this.transactionService.getTransactionsByPeriod(token, period));
         } else {
-            return ResponseEntity.ok(this.transactionService.getAllUserTransactionsByType(token, type));
+            return ResponseEntity.ok(this.transactionService.getAllUserTransaction(token));
         }
     }
 

@@ -2,6 +2,7 @@ package com.ohlavrac.meu_dinheirinho_api.repositories;
 
 import java.util.UUID;
 import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,7 @@ public interface TransactionRepository  extends JpaRepository<TransactionEntity,
 
     @Query("SELECT t FROM TransactionEntity t WHERE t.id = :transactionId AND t.users.id = :userId")
     Optional<TransactionEntity> getUserTransactionById(@Param("transactionId") UUID transactionId, @Param("userId") UUID userId);
+
+    @Query("SELECT t FROM TransactionEntity t WHERE t.updated_at > :time AND t.users.id = :userId")
+    Optional<List<TransactionEntity>> getTransactionsByTime(@Param("time") Date time, @Param("userId") UUID userId);
 }
