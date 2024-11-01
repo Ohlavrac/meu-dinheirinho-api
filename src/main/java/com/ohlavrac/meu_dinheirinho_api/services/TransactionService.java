@@ -16,6 +16,7 @@ import com.ohlavrac.meu_dinheirinho_api.domain.enums.TransactionType;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionRequestDTO;
 import com.ohlavrac.meu_dinheirinho_api.dtos.transaction_dtos.TransactionResponseDTO;
 import com.ohlavrac.meu_dinheirinho_api.infra.security.TokenService;
+import com.ohlavrac.meu_dinheirinho_api.mappers.TransactionsMapper;
 import com.ohlavrac.meu_dinheirinho_api.repositories.TransactionRepository;
 import com.ohlavrac.meu_dinheirinho_api.repositories.UserRepository;
 import com.ohlavrac.meu_dinheirinho_api.utils.VerifyPeriod;
@@ -33,6 +34,9 @@ public class TransactionService {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private TransactionsMapper transactionsMapper;
 
     @Transactional
     public void createTransaction(String token, TransactionRequestDTO data) {
@@ -56,17 +60,9 @@ public class TransactionService {
 
     public List<TransactionResponseDTO> getAllUserTransaction(String token) {
         UsersEntity user = getUSer(token);
-
-        //TODO TRANSFORMAR A ESSA CONVERÇÃO E UM MAPPER
-        return this.transactionRepository.findByUsersId(user.getId()).stream().map(transaction -> new TransactionResponseDTO(
-            transaction.getId(),
-            transaction.getTitle(),
-            transaction.getValue(),
-            transaction.getTransaction_type(),
-            transaction.getCategory(),
-            transaction.getCreated_at(),
-            transaction.getUpdated_at()
-        )).toList();
+        List<TransactionEntity> transactions = this.transactionRepository.findByUsersId(user.getId());
+        List<TransactionResponseDTO> transactionsResponseDto = this.transactionsMapper.transactionsEntityToDTO(transactions);
+        return transactionsResponseDto;
     }
 
     public TransactionResponseDTO getUserTransactionById(String token, UUID id) {
@@ -74,15 +70,7 @@ public class TransactionService {
 
         TransactionEntity transactionEntity = this.transactionRepository.getUserTransactionById(id, user.getId()).orElseThrow(() -> new RuntimeException("Transaction not foud"));
 
-        return new TransactionResponseDTO(
-            transactionEntity.getId(),
-            transactionEntity.getTitle(),
-            transactionEntity.getValue(),
-            transactionEntity.getTransaction_type(),
-            transactionEntity.getCategory(),
-            transactionEntity.getCreated_at(),
-            transactionEntity.getUpdated_at()
-        );
+        return this.transactionsMapper.entityToDto(transactionEntity);
     }
 
     public List<TransactionResponseDTO> getAllUserTransactionsByType(String token, TransactionType type) {
@@ -92,15 +80,7 @@ public class TransactionService {
 
         for (int index = 0; index < transactionsEntity.size(); index++) {
             if (transactionsEntity.get(index).getTransaction_type() == type) {
-                transctionsResponse.add(new TransactionResponseDTO(
-                    transactionsEntity.get(index).getId(),
-                    transactionsEntity.get(index).getTitle(),
-                    transactionsEntity.get(index).getValue(),
-                    transactionsEntity.get(index).getTransaction_type(),
-                    transactionsEntity.get(index).getCategory(),
-                    transactionsEntity.get(index).getCreated_at(),
-                    transactionsEntity.get(index).getUpdated_at()
-                ));
+                transctionsResponse.add(this.transactionsMapper.entityToDto(transactionsEntity.get(index)));
             } else {
                 continue;
             }
@@ -174,15 +154,7 @@ public class TransactionService {
         
         for (int index = 0; index <= transactionEntity.size(); index++) {
             if (transactionEntity.get(index).getTransaction_type() == type) {
-                transctionsResponse.add(new TransactionResponseDTO(
-                    transactionEntity.get(index).getId(),
-                    transactionEntity.get(index).getTitle(),
-                    transactionEntity.get(index).getValue(),
-                    transactionEntity.get(index).getTransaction_type(),
-                    transactionEntity.get(index).getCategory(),
-                    transactionEntity.get(index).getCreated_at(),
-                    transactionEntity.get(index).getUpdated_at()
-                ));
+                transctionsResponse.add(this.transactionsMapper.entityToDto(transactionEntity.get(index)));
             }
         }
 
@@ -198,15 +170,7 @@ public class TransactionService {
         List<TransactionEntity> transactionEntity = this.transactionRepository.getTransactionsByTime(
             java.sql.Date.valueOf(periodDateTime), user.getId()).orElseThrow(() -> new RuntimeException("Transactions not found"));
         
-        return transactionEntity.stream().map(transaction -> new TransactionResponseDTO(
-            transaction.getId(),
-            transaction.getTitle(),
-            transaction.getValue(),
-            transaction.getTransaction_type(),
-            transaction.getCategory(),
-            transaction.getCreated_at(),
-            transaction.getUpdated_at()
-        )).toList();
+        return this.transactionsMapper.transactionsEntityToDTO(transactionEntity);
     }
 
     private UsersEntity getUSer(String token) {
